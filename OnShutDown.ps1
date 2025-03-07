@@ -1,0 +1,1 @@
+Add-Content -Path "$([Environment]::GetFolderPath('MyDocuments'))\TimeTracker\TimeTracker $(Get-Date -Format 'dd.MM.yyyy').txt" -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [END] User '$(whoami)' was logged out on computer '$(hostname)'"

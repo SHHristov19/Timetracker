@@ -1,0 +1,6 @@
+[2025-03-07 18:48:30] [START] User 'tl-hq\shhristov' was logged in on computer 'SHHristov' with Explorer started.
+[2025-03-07 18:54:16] [BREAK] User 'tl-hq\shhristov' left the workingspace 'SHHristov'
+[2025-03-07 18:54:22] [BREAK] User 'tl-hq\shhristov' entered the workingspace 'SHHristov'
+[2025-03-07 18:54:44] [BREAK] User 'tl-hq\shhristov' left the workingspace 'SHHristov'
+[2025-03-07 18:55:04] [BREAK] User 'tl-hq\shhristov' entered the workingspace 'SHHristov'
+[2025-03-07 18:57:58] [END] User 'tl-hq\shhristov' was logged out on computer 'SHHristov'

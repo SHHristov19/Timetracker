@@ -1,0 +1,80 @@
+Get-Process -Name devenv | Sort-Object StartTime | Select-Object -First 1 | Select-Object
+Get-Date -Format 'HH:mm:ss'
+
+Get-Date (Get-Process -Name devenv | Sort-Object StartTime | Select-Object -First 1 | Select-Object).StartTime -Format 'HH:mm:ss'
+
+
+
+# Get the start time of the first 'devenv' process
+$startTime = (Get-Process -Name devenv | Sort-Object StartTime | Select-Object -First 1).StartTime
+
+# Get the current time
+$currentTime = Get-Date
+
+# Calculate the time difference
+$timeDifference = $currentTime - $startTime
+
+# Output the difference in a readable format
+$timeDifference.ToString("hh\:mm\:ss")
+
+
+
+Get-Process winlogon - logout
+(Get-Process -Name winlogon | Select-Object -First 1).StartTime.ToString("HH:mm:ss")
+
+Get-Process explorer - login
+Get-Date (Get-Process -Name explorer | Select-Object -First 1).StartTime -Format 'HH:mm:ss'
+
+
+
+$startTime = Get-Date (Get-Process -Name explorer | Select-Object -First 1).StartTime
+$currentTime = Get-Date
+$timeDifference = $currentTime - $startTime
+
+$timeDifference.ToString("hh\:mm\:ss")
+
+Get-WinEvent -Path 'C:\Windows\System32\winevt\Logs\Security.evtx' - MaxEvents 10
+
+-WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You enter the workstation','Login')}"
+-WindowStyle Hidden -Command "& { Add-Type -AssemblyName 'System.Windows.Forms'; [System.Windows.Forms.MessageBox]::Show('You entered the workstation', 'Login')}"
+
+
+
+# Define the file path
+$filePath = "C:\Users\shhristov\Documents\Time Tracker\time.txt"
+
+# Read the file contents and extract datetime values using regex
+$times = Get-Content $filePath | ForEach-Object { 
+    if ($_ -match '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') {
+        [datetime]::ParseExact($matches[0], "yyyy-MM-dd HH:mm:ss", $null)
+    }
+}
+
+# Ensure we have an even number of timestamps
+if ($times.Count % 2 -ne 0) {
+    Write-Output "Error: The file contains an odd number of timestamps."
+    exit
+}
+
+$totalTime = [timespan]::Zero
+
+# Iterate through pairs (Login at odd index, Logout at even index)
+for ($i = 0; $i -lt $times.Count; $i += 2) {
+    $loginTime = $times[$i]  # Odd index is login
+    $logoutTime = $times[$i + 1]  # Even index is logout
+    $sessionTime = $logoutTime - $loginTime  # Calculate session time as logoutTime - loginTime
+    Write-Output "Session $($i/2 + 1): $sessionTime"
+    $totalTime += $sessionTime
+}
+
+Write-Output "Total Time of Breaks: $totalTime"
+
+-Command "Add-Content -Path '$([Environment]::GetFolderPath('MyDocuments'))\TimeTracker\TimeTracker $(Get-Date -Format 'dd.MM.yyyy').txt' -Value '[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [START] User ''$(whoami)'' was logged in on computer ''$(hostname)'' with Explorer started.'"
+
+Add-Content -Path "$([Environment]::GetFolderPath('MyDocuments'))\TimeTracker\TimeTracker $(Get-Date -Format 'dd.MM.yyyy').txt" -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [START] User '$(whoami)' was logged in on computer '$(hostname)'"
+
+Add-Content -Path "$([Environment]::GetFolderPath('MyDocuments'))\TimeTracker\TimeTracker $(Get-Date -Format 'dd.MM.yyyy').txt" -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [BREAK] User '$(whoami)' left the workingspace '$(hostname)'"
+
+Add-Content -Path "$([Environment]::GetFolderPath('MyDocuments'))\TimeTracker\TimeTracker $(Get-Date -Format 'dd.MM.yyyy').txt" -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [BREAK] User '$(whoami)' entered the workingspace '$(hostname)'"
+
+Add-Content -Path "$([Environment]::GetFolderPath('MyDocuments'))\TimeTracker\TimeTracker $(Get-Date -Format 'dd.MM.yyyy').txt" -Value "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] [END] User '$(whoami)' was logged out on computer '$(hostname)'"
