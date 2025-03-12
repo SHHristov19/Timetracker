@@ -1,70 +1,40 @@
-# Define the path to the folder containing XML files
-$TaskXmlFolder = "E:\TimeTracker\Timetracker"  # Change this to your folder path
+﻿# Define an array of XML URLs
+$xmlUrls = @(
+    "https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/TimeTracker-OnStart.xml",
+    "https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/TimeTracker-OnBreakStart.xml",
+    "https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/TimeTracker-OnBreakEnd.xml",
+    "https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/TimeTracker-OnShutDown.xml"
+)
 
-# Get the current user's SID
+# Retrieve the User SID
 $UserSID = (Get-WmiObject Win32_UserAccount | Where-Object { $_.Name -eq $env:USERNAME }).SID
-if (-not $UserSID) {
-    Write-Host "Failed to retrieve user SID" -ForegroundColor Red
-    exit
-}
 
-# Get all XML files in the specified folder
-$XmlFiles = Get-ChildItem -Path $TaskXmlFolder -Filter "*.xml"
+# Get the current date in the desired format (ISO 8601)
+$currentDate = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fff")
 
-if ($XmlFiles.Count -eq 0) {
-    Write-Host "No XML files found in $TaskXmlFolder" -ForegroundColor Yellow
-    exit
-}
+# Loop through each URL
+foreach ($xmlUrl in $xmlUrls) {
+    # Define the path where the file will be stored (in the TEMP folder)
+    $xmlFilePath = (Get-ChildItem Env:TEMP).Value + '\' + [System.IO.Path]::GetFileName($xmlUrl)
 
-foreach ($XmlFile in $XmlFiles) {
-    # Extract the task name from the file name (without extension)
-    $TaskName = [System.IO.Path]::GetFileNameWithoutExtension($XmlFile.Name)
+    # Download the XML file to the TEMP folder
+    Invoke-WebRequest -Uri $xmlUrl -OutFile $xmlFilePath
 
-    # Ensure task name is not empty
-    if ([string]::IsNullOrWhiteSpace($TaskName)) {
-        Write-Host "⚠ Skipping file with empty task name: $XmlFile.FullName" -ForegroundColor Yellow
-        continue
-    }
+    # Create a new XmlDocument object
+    $XmlObject = New-Object -TypeName System.Xml.XmlDocument
 
-    # Load the XML file
-    [xml]$XmlContent = Get-Content $XmlFile.FullName
+    # Load the downloaded XML file into the XmlDocument object
+    $XmlObject.Load($xmlFilePath)
 
-    # Find and update the <UserId> element with the current user's SID
-    if ($XmlContent.Task.Principals.Principal.UserId) {
-        $XmlContent.Task.Principals.Principal.UserId = $UserSID
-        $XmlContent.Save($XmlFile.FullName)
-        Write-Host "Updated UserId in $XmlFile with SID: $UserSID" -ForegroundColor Cyan
-    } else {
-        Write-Host "No <UserId> element found in $XmlFile, skipping update." -ForegroundColor Yellow
-    }
+    # Insert User SID into the XML
+    $XmlObject.Task.Principals.Principal.UserId = $UserSID
 
-    # Import the modified XML into Task Scheduler
-    $XmlFilePath = "`"" + $XmlFile.FullName + "`""  # Ensure proper quoting
-	
-	$Command = @(
-		"/create",
-		"/tn", "`"$TaskName`"",
-		"/xml", "`"$XmlFilePath`"",
-		"/RU", "$env:USERNAME",
-		"/f"
-	)
+    # Update the Date tag in RegistrationInfo to the current date
+    $XmlObject.Task.RegistrationInfo.Date = $currentDate
 
-	# Run schtasks through PowerShell
-	$Process = Start-Process -FilePath "schtasks" -ArgumentList $Command -NoNewWindow -PassThru -Wait
+    # Extract Task Name from XML
+    $TaskName = $XmlObject.Task.RegistrationInfo.URI -replace "^\\", ""
 
-    # Check if the command was successful
-    if ($Process.ExitCode -eq 0) {
-        Write-Host "Successfully imported: $TaskName" -ForegroundColor Green
-    } else {
-        Write-Host "Failed to import: $TaskName" -ForegroundColor Red
-    }
-}
-
-# Run ImportInScheduler.ps1 after processing all XML files
-$ImportScriptPath = "E:\TimeTracker\Timetracker\ImportInScheduler.ps1"
-if (Test-Path $ImportScriptPath) {
-    Write-Host "Executing ImportInScheduler.ps1..." -ForegroundColor Blue
-    powershell -ExecutionPolicy Bypass -File $ImportScriptPath
-} else {
-    Write-Host "⚠ ImportInScheduler.ps1 not found, skipping execution." -ForegroundColor Yellow
+    # Register the scheduled task
+    Register-ScheduledTask -Xml $XmlObject.OuterXml -TaskName $TaskName -User ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -Force
 }
