@@ -36,5 +36,5 @@ foreach ($xmlUrl in $xmlUrls) {
     $TaskName = $XmlObject.Task.RegistrationInfo.URI -replace "^\\", ""
 
     # Register the scheduled task
-    Register-ScheduledTask -Xml $XmlObject.OuterXml -TaskName $TaskName -User ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -Force
+    Register-ScheduledTask -Xml $XmlObject.OuterXml -TaskName $TaskName -User ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -Force | Out-Null
 }
