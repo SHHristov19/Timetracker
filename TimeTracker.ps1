@@ -26,4 +26,4 @@ for ($i = 0; $i -lt $times.Count; $i += 2) {
     $totalTime += $sessionTime
 }
 
-Write-Output "Total Time of Breaks: $totalTime"
+Write-Output "Total working hours: $totalTime"
