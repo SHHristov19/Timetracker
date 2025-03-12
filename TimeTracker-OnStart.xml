@@ -14,7 +14,7 @@
   <Principals>
     <Principal id="Author">
       <UserId></UserId>
-      <LogonType>S4U</LogonType>
+      <LogonType>Password</LogonType>
       <RunLevel>HighestAvailable</RunLevel>
     </Principal>
   </Principals>
