@@ -43,7 +43,7 @@
   <Actions Context="Author">
     <Exec>
       <Command>powershell.exe</Command>
-      <Arguments>-ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/OnBreakStart.ps1' -OutFile ((Get-ChildItem Env:TEMP).Value + '\OnBreakStart.ps1') -UseBasicParsing; PowerShell -ExecutionPolicy Bypass -File ((Get-ChildItem Env:TEMP).Value + '\OnBreakStart.ps1')" | Out-Null</Arguments>
+      <Arguments>-ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/OnBreakStart.ps1' -OutFile ((Get-ChildItem Env:TEMP).Value + '\OnBreakStart.ps1') -UseBasicParsing; PowerShell -ExecutionPolicy Bypass -File ((Get-ChildItem Env:TEMP).Value + '\OnBreakStart.ps1')"</Arguments>
     </Exec>
   </Actions>
 </Task>
