@@ -14,7 +14,7 @@
   <Principals>
     <Principal id="Author">
       <UserId></UserId>
-      <LogonType>Password</LogonType>
+      <LogonType>S4U</LogonType>
       <RunLevel>HighestAvailable</RunLevel>
     </Principal>
   </Principals>
@@ -42,7 +42,7 @@
   <Actions Context="Author">
     <Exec>
       <Command>powershell.exe</Command>
-      <Arguments>-WindowStyle Hidden -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/OnStart.ps1' -OutFile ((Get-ChildItem Env:TEMP).Value + '\OnStart.ps1') -UseBasicParsing; PowerShell -ExecutionPolicy Bypass -File ((Get-ChildItem Env:TEMP).Value + '\OnStart.ps1')"</Arguments>
+      <Arguments>-ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/OnStart.ps1' -OutFile ((Get-ChildItem Env:TEMP).Value + '\OnStart.ps1') -UseBasicParsing; PowerShell -ExecutionPolicy Bypass -File ((Get-ChildItem Env:TEMP).Value + '\OnStart.ps1')"</Arguments>
     </Exec>
   </Actions>
 </Task>
