@@ -32,7 +32,7 @@
     </IdleSettings>
     <AllowStartOnDemand>true</AllowStartOnDemand>
     <Enabled>true</Enabled>
-    <Hidden>false</Hidden>
+    <Hidden>true</Hidden>
     <RunOnlyIfIdle>false</RunOnlyIfIdle>
     <DisallowStartOnRemoteAppSession>false</DisallowStartOnRemoteAppSession>
     <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
@@ -42,7 +42,7 @@
   </Settings>
   <Actions Context="Author">
     <Exec>
-      <Command>powershell</Command>
+      <Command>powershell.exe</Command>
       <Arguments>-ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/SHHristov19/Timetracker/refs/heads/main/OnBreakEnd.ps1' -OutFile ((Get-ChildItem Env:TEMP).Value + '\OnBreakEnd.ps1') -UseBasicParsing; PowerShell -ExecutionPolicy Bypass -File ((Get-ChildItem Env:TEMP).Value + '\OnBreakEnd.ps1')"</Arguments>
     </Exec>
   </Actions>
