@@ -1,5 +1,6 @@
 # Define the file path
-$filePath = "C:\Users\shhristov\Documents\Time Tracker\time.txt"
+$currentDate = Get-Date -Format "dd.MM.yyyy"
+$filePath = "$env:USERPROFILE\Documents\TimeTracker\TimeTracker $currentDate.txt"
 
 # Read the file contents and extract datetime values using regex
 $times = Get-Content $filePath | ForEach-Object { 
