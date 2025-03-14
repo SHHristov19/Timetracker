@@ -26,8 +26,7 @@ $startTime = $entries[0].DateTime.TimeOfDay
 $endTime = $null
 $breaks = @()
 $workTime = [timespan]::Zero
-
-Write-Output "Time of start: $startTime"
+ 
 
 # Process entries
 $pendingBreakStart = $null  # Stores unmatched break start times
@@ -52,12 +51,7 @@ for ($i = 1; $i -lt $entries.Count; $i++) {
         $endTime = $current.DateTime
     }
 }
-
-# Check for unpaired break start
-if ($pendingBreakStart) {
-    Write-Output "Warning: Unmatched break start at $pendingBreakStart. Ignoring it!"
-}
-
+ 
 # Use current time if END is missing
 if (-Not $endTime) {
     $endTime = Get-Date
@@ -65,9 +59,52 @@ if (-Not $endTime) {
 
 # Calculate total working time excluding breaks
 $workTime = $endTime - $startTime
-foreach ($b in $breaks) {
-    Write-Output "Break from $($b.Start.TimeOfDay) to $($b.End.TimeOfDay)"
+foreach ($b in $breaks) { 
     $workTime -= ($b.End - $b.Start)
 }
  
-Write-Output ("Total working hours: " + $workTime.ToString("hh\:mm\:ss"))
+Add-Type -AssemblyName PresentationFramework
+
+# Create the window
+$window = New-Object System.Windows.Window
+$window.Title = "Work Hours Summary for today " +  $endTime.ToString("dd.MM.yyyy")
+$window.Width = 500
+$window.Height = 200
+$window.WindowStartupLocation = [System.Windows.WindowStartupLocation]::CenterScreen  # Centers the window on screen
+
+# Create a StackPanel to display the content
+$stackPanel = New-Object System.Windows.Controls.StackPanel
+$stackPanel.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Center
+$stackPanel.VerticalAlignment = [System.Windows.VerticalAlignment]::Center
+$window.Content = $stackPanel
+
+# Add start time with larger text
+$stackPanel.Children.Add((New-Object System.Windows.Controls.TextBlock -Property @{
+    Text = "Time of start: $startTime"
+    FontSize = 18  # Larger font size
+}))
+
+# Add breaks with larger text
+$breaks | ForEach-Object {
+    $stackPanel.Children.Add((New-Object System.Windows.Controls.TextBlock -Property @{
+        Text = "Break from $($_.Start) to $($_.End)"
+        FontSize = 16  # Larger font size
+    }))
+}
+
+# Add end time with larger text
+$stackPanel.Children.Add((New-Object System.Windows.Controls.TextBlock -Property @{
+    Text = "Time of end: $endTime"
+    FontSize = 18  # Larger font size
+}))
+
+# Add total working hours with bold and larger text
+$totalTimeText = New-Object System.Windows.Controls.TextBlock -Property @{
+    Text = "Total working hours: " + $workTime.ToString("hh\:mm\:ss")
+    FontSize = 20  # Larger font size
+    FontWeight = [System.Windows.FontWeights]::Bold  # Bold font
+}
+$stackPanel.Children.Add($totalTimeText)
+
+# Show the window
+$window.ShowDialog()
