@@ -22,7 +22,7 @@ if (-Not $entries -or $entries[0].Event -ne "START") {
     Write-Output "Error: The log file must start with [START]"
 }
 
-$startTime = $entries[0].DateTime.TimeOfDay
+$startTime = $entries[0].DateTime
 $endTime = $null
 $breaks = @()
 $workTime = [timespan]::Zero
@@ -80,7 +80,7 @@ $window.Content = $stackPanel
 
 # Add start time with larger text
 $stackPanel.Children.Add((New-Object System.Windows.Controls.TextBlock -Property @{
-    Text = "Time of start: $startTime"
+    Text = "Time of start: $($startTime.TimeOfDay)"
     FontSize = 18  # Larger font size
 }))
 
@@ -94,7 +94,7 @@ $breaks | ForEach-Object {
 
 # Add end time with larger text
 $stackPanel.Children.Add((New-Object System.Windows.Controls.TextBlock -Property @{
-    Text = "Time of end: $endTime"
+    Text = "Time of end: $($endTime.TimeOfDay)"
     FontSize = 18  # Larger font size
 }))
 
